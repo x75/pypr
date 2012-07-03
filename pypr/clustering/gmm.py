@@ -522,7 +522,7 @@ def cond_dist(Y, centroids, ccov, mc):
 
     Parameters
     ----------
-    Y : NxD array
+    Y : D array
         An array of inputs. Inputs set to NaN are not set, and become inputs to
         the resulting distribution. Order is preserved.
     centroids : list
@@ -554,22 +554,102 @@ def cond_dist(Y, centroids, ccov, mc):
         new_ccov = copy.deepcopy(ccov[i])
         new_ccov = new_ccov[:,new_idx]
         new_ccov = new_ccov[new_idx,:]
-        ux = centroids[i][not_set_idx]
-        uy = centroids[i][set_idx]
-        A = new_ccov[0:len(not_set_idx), 0:len(not_set_idx)]
-        B = new_ccov[len(not_set_idx):, len(not_set_idx):]
-        C = new_ccov[0:len(not_set_idx), len(not_set_idx):]
-        cen = ux + np.dot(np.dot(C, np.linalg.inv(B)), (y - uy))
-        cov = A - np.dot(np.dot(C, np.linalg.inv(B)), C.transpose())
+        #ux = centroids[i][not_set_idx]
+        #uy = centroids[i][set_idx]
+        #A = new_ccov[0:len(not_set_idx), 0:len(not_set_idx)]
+        #B = new_ccov[len(not_set_idx):, len(not_set_idx):]
+        #C = new_ccov[0:len(not_set_idx), len(not_set_idx):]
+        #cen = ux + np.dot(np.dot(C, np.linalg.inv(B)), (y - uy))
+        #cov = A - np.dot(np.dot(C, np.linalg.inv(B)), C.transpose())
+        ua = centroids[i][not_set_idx]
+        ub = centroids[i][set_idx]
+        Saa = new_ccov[0:len(not_set_idx), 0:len(not_set_idx)]
+        Sbb = new_ccov[len(not_set_idx):, len(not_set_idx):]
+        Sab = new_ccov[0:len(not_set_idx), len(not_set_idx):]
+        L = np.linalg.inv(new_ccov)
+        Laa = L[0:len(not_set_idx), 0:len(not_set_idx)]
+        Lbb = L[len(not_set_idx):, len(not_set_idx):]
+        Lab = L[0:len(not_set_idx), len(not_set_idx):]
+        cen = ua - np.dot(np.dot(np.linalg.inv(Laa), Lab), (y-ub))
+        cov = np.linalg.inv(Laa)
         new_cen.append(cen)
         new_ccovs.append(cov)
-        fk.append(mulnormpdf(Y[set_idx], uy, B)) # Used for normalizing the mc
+        #fk.append(mulnormpdf(Y[set_idx], uy, B)) # Used for normalizing the mc
+        fk.append(mulnormpdf(Y[set_idx], ub, Sbb)) # Used for normalizing the mc
     # Normalize the mixing coef: p(X|Y) = p(Y,X) / p(Y) using the marginal dist.
     fk = np.array(fk).flatten()
     new_mc = (mc*fk)
     new_mc = new_mc / np.sum(new_mc)
     return (new_cen, new_ccovs, new_mc)
 
+def cond_moments(X, centroids, ccov, mc):
+    """EXPERIMENTAL CODE.
+
+    Finds the conditional mean and variance evaluated at a point X.
+
+    See "Active Learning with Statistical Models", David A. Cohn, et al.
+
+    Parameters
+    ----------
+    X : D array
+        An array of inputs. Inputs set to NaN are not set, and become inputs to
+        the resulting distribution. Order is preserved.
+    centroids : list
+        List of cluster centers - [ [x1,y1,..],..,[xN, yN,..] ]
+    ccov : list
+        List of cluster co-variances DxD matrices
+    mc : list
+        Mixing cofficients for each cluster (must sum to one) by default equal
+        for each cluster.
+
+    Returns
+    -------
+    res : tuple
+        A tuple containing a new set of (centroids, ccov, mc) for the
+        conditional distribution.
+    """
+    not_set_idx = np.nonzero(np.isnan(X))[0]
+    set_idx = np.nonzero(True - np.isnan(X))[0]
+    new_idx = np.concatenate((not_set_idx, set_idx))
+
+    x = X[set_idx]
+    y_i = []
+    sigma_yx_i = []
+    px_i = []
+    px_sum = 0
+    N = 60
+    for i in range(len(centroids)):
+        new_ccov = copy.deepcopy(ccov[i])
+        new_ccov = new_ccov[:,new_idx]
+        new_ccov = new_ccov[new_idx,:]
+        set_cov = new_ccov[len(not_set_idx):, len(not_set_idx):]
+        set_u = centroids[i][set_idx]
+        px_i.append(mulnormpdf(x, set_u, set_cov))
+        #
+        not_set_u = centroids[i][not_set_idx]
+        inv_sigma_x_i = np.linalg.inv(set_cov)
+        sigma_xy_i = new_ccov[len(not_set_idx):,:len(not_set_idx)]
+        dx = (x-set_u)
+        tmp = np.dot(sigma_xy_i, inv_sigma_x_i)
+        y_i.append(not_set_u + np.dot(tmp, dx))
+        #
+        sigma_y_i = new_ccov[:len(not_set_idx),:len(not_set_idx)]
+        sigma_yx_i.append(sigma_y_i - np.dot(sigma_xy_i.T, np.dot(inv_sigma_x_i, sigma_xy_i)))
+
+    px_sum = np.sum(px_i)    
+    h = [z/px_sum for z in px_i]
+
+    y = np.sum(np.array(h) * np.array(y_i))
+    sigma_y = np.zeros((len(not_set_idx), len(not_set_idx)))
+    n_i = N * mc
+    for i in range(len(centroids)):
+        set_u = centroids[i][set_idx]
+        inv_sigma_x_i = np.linalg.inv(set_cov)
+        tmp = np.eye(len(set_idx)) + np.dot(np.dot((x-set_u).T, inv_sigma_x_i), x-set_u)
+        sigma_y += (h[i]**2 / n_i[i]) * np.dot(sigma_yx_i[i], tmp)
+    return y, sigma_y
+
+    
 def marg_dist(X_idx, centroids, ccov, mc):
     """Finds the marginal distribution p(X) for a GMM.
 
@@ -666,16 +746,26 @@ def predict(X, centroids, ccov, mc):
 
     Returns
     -------
-    Nothing - X is modified
+    var : list
+        List of variance
     """
     samples, D = X.shape
+    variance_list = []
     for i in range(samples):
         row = X[i, :]
         targets = np.isnan(row)
+        num_targets = np.sum(targets)
         cen_cond, cov_cond, mc_cond = cond_dist(row, centroids, ccov, mc)
         X[i, targets] = np.zeros(np.sum(targets))
+        vara = np.zeros((num_targets, num_targets))
+        varb = np.zeros((num_targets, num_targets))
         for j in range(len(cen_cond)):
             X[i,targets] = X[i,targets] + (cen_cond[j]*mc_cond[j])
+            vara = vara + mc_cond[j] * \
+                (np.dot(cen_cond[j], cen_cond[j]) + cov_cond[j])
+            varb = varb + mc_cond[j] * cen_cond[j]
+        variance_list.append(vara - np.dot(varb, varb))
+    return variance_list
 
 em = em_gm
 
