@@ -163,8 +163,8 @@ def kmeans(X, K, iter=20, verbose = False, \
         raise "Unknown initialization of k-means centroids."
 
     if verbose:
-        print "Initial cluster centers: "
-        print cc
+        print("Initial cluster centers: ")
+        print(cc)
     oldcc = cc.copy()
 
     for ct in range(0, iter):
@@ -178,20 +178,20 @@ def kmeans(X, K, iter=20, verbose = False, \
         # Break if centers have not changed
         if ( np.sum(cc==oldcc) == np.sum(np.ones(cc.shape)) ):
             if verbose:
-                print "Stopped after %i iterations, no more change." % ct
+                print("Stopped after %i iterations, no more change." % ct)
             break
         
         if delta_stop is not None:
             change = np.abs( np.nan_to_num(cc - oldcc) )
-            print change
+            print(change)
             if not(np.any(change > delta_stop)):
                 if verbose:
-                    print "Stopped after %i iterations," + \
-                        " all changes below delta_stop." % ct
+                    print("Stopped after %i iterations," + \
+                        " all changes below delta_stop." % ct)
                 break
         oldcc=cc.copy()
 
     if verbose:
-        print "Final cluster centers: "
-        print cc
+        print("Final cluster centers: ")
+        print(cc)
     return membership, cc

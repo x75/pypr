@@ -69,7 +69,7 @@ title('Mean square error = %.2f'%np.mean(err))
 
 # Plot sample autocorrelation of the residual of the fitted model
 figure()
-lags = range(0,21)
+lags = list(range(0,21))
 stem(lags, sac(Y-T, lags))
 title('Sample Autocorrelation of residuals')
 xlabel('Lag')

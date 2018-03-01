@@ -116,7 +116,7 @@ def minimize(X, f, df, length, verbose = False, return_result = False,
                         raise Exception("isnan, isinf")
                     success = True
                 except:
-                    print "Sorry:", sys.exc_type, ":", sys.exc_value 
+                    print("Sorry:", sys.exc_info()[0], ":", sys.exc_info()[1]) 
                     x3 = (x2 + x3)/2
 
             if (f3 < F0):
@@ -170,7 +170,7 @@ def minimize(X, f, df, length, verbose = False, return_result = False,
             if callback!=None:
                 callback(X)
             if (verbose):
-                print S, " ", i, " Value: ", f0
+                print(S, " ", i, " Value: ", f0)
             s = (np.dot(df3, df3.T) - np.dot(df0,df3.T)) / \
                 np.dot(df0,df0.T)*s - df3;   # Polack-Ribiere CG direction
             df0 = df3;                                  # swap derivatives

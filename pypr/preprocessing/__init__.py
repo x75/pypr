@@ -1,4 +1,4 @@
 __all__ = ["normalizer", "pca"]
 
-from normalizer import *
-from pca import *
+from .normalizer import *
+from .pca import *

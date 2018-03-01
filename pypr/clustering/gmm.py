@@ -4,11 +4,11 @@
 
 import numpy as np
 import numpy.linalg as linalg
-import kmeans
+from . import kmeans
 import copy
 import types
 from copy import deepcopy
-import gauss_diff
+from . import gauss_diff
 import pypr.preprocessing as preproc
 
 def mulnormpdf(X, MU, SIGMA):
@@ -43,7 +43,7 @@ def mulnormpdf(X, MU, SIGMA):
     """
     # Check if inputs are ok:
     if MU.ndim != 1:
-        raise ValueError, "MU must be a 1 dimensional array"
+        raise ValueError
     
     # Evaluate pdf at points or point:
     mu = MU
@@ -81,7 +81,7 @@ def logmulnormpdf(X, MU, SIGMA):
     """
     # Check if inputs are ok:
     if MU.ndim != 1:
-        raise ValueError, "MU must be a 1 dimensional array"
+        raise ValueError("MU must be a 1 dimensional array")
     
     # Evaluate pdf at points or point:
     #ex = _cal_ex(X, MU, SIGMA)
@@ -129,7 +129,7 @@ def gmm_pdf(X, centroids, ccov, mc, individual=False):
         pdf = None
         for i in range(len(centroids)):
             pdfadd = mulnormpdf(X, centroids[i], ccov[i]) * mc[i]
-            if pdf==None:
+            if pdf is None:
                 pdf = pdfadd
             else:
                 pdf = pdf + pdfadd
@@ -174,16 +174,16 @@ def sample_gaussian_mixture(centroids, ccov, mc = None, samples = 1):
     if mc is None: # Default equally likely clusters
         mc = np.ones(K) / K
     if len(ccov) != K:
-        raise ValueError, "centroids and ccov must contain the same number" +\
-            "of elements."
+        raise ValueError("centroids and ccov must contain the same number" +\
+            "of elements.")
     if len(mc) != K:
-        raise ValueError, "centroids and mc must contain the same number" +\
-            "of elements."
+        raise ValueError("centroids and mc must contain the same number" +\
+            "of elements.")
 
     # Check if the mixing coefficients sum to one:
     EPS = 1E-15
     if np.abs(1-np.sum(mc)) > EPS:
-        raise ValueError, "The sum of mc must be 1.0"
+        raise ValueError("The sum of mc must be 1.0")
 
     # Cluster selection
     cs_mc = np.cumsum(mc)
@@ -246,12 +246,12 @@ def gmm_init(X, K, verbose = False,
     """
     samples, dim = np.shape(X)
     if cluster_init == 'sample':
-        if verbose: print "Using sample GMM initalization."
+        if verbose: print("Using sample GMM initalization.")
         center_list = []
         for i in range(K):
             center_list.append(X[np.random.randint(samples), :])
     elif cluster_init == 'box':
-        if verbose: print "Using box GMM initalization."
+        if verbose: print("Using box GMM initalization.")
         center_list = []
         X_max = np.max(X, axis=0)
         X_min = np.min(X, axis=0)
@@ -259,7 +259,7 @@ def gmm_init(X, K, verbose = False,
             init_point = ((X_max-X_min)*np.random.rand(1,dim)) + X_min
             center_list.append(init_point.flatten())            
     elif cluster_init == 'kmeans':
-        if verbose: print "Using K-means GMM initalization."
+        if verbose: print("Using K-means GMM initalization.")
         # Normalize data (K-means is isotropic)
         normalizerX = preproc.Normalizer(X)
         nX = normalizerX.transform(X)
@@ -275,7 +275,7 @@ def gmm_init(X, K, verbose = False,
         cc = normalizerX.invtransform(cc)
         for i in range(cc.shape[0]):
             center_list.append(cc[i,:])
-        print cc
+        print(cc)
     else:
         raise "Unknown initialization of EM of MoG centers."
 
@@ -354,7 +354,7 @@ def em_gm(X, K, max_iter = 50, verbose = False, \
             clusters_found = True
         except Cov_problem:
             if verbose:
-                print "Problems with the co-variance matrix, tries left ", max_tries
+                print("Problems with the co-variance matrix, tries left ", max_tries)
 
     if clusters_found:
         return center_list, cov_list, p_k, logL
@@ -378,7 +378,7 @@ def gmm_em_continue(X, center_list, cov_list, p_k,
         diag_add_vec = diag_add * feature_var
     old_logL = np.NaN
     logL = np.NaN
-    for i in xrange(max_iter):
+    for i in range(max_iter):
         try:
 ##                    if diag_add != 0:
 ##                        for c in cov_list:
@@ -393,16 +393,16 @@ def gmm_em_continue(X, center_list, cov_list, p_k,
         # Check if we have problems with cluster sizes
         for i2 in range(len(center_list)):
             if np.any(np.isnan(cov_list[i2])):
-                print "problem"
+                print("problem")
                 raise Cov_problem()
 
         if old_logL != np.NaN:
             if verbose:
-                print "iteration=", i, " delta log likelihood=", \
-                    old_logL - logL
+                print("iteration=", i, " delta log likelihood=", \
+                    old_logL - logL)
             if np.abs(logL - old_logL) < delta_stop: #* samples:
                 delta_stop_count += 1
-                if verbose: print "gmm_em_continue: delta_stop_count =", delta_stop_count
+                if verbose: print("gmm_em_continue: delta_stop_count =", delta_stop_count)
             else:
                 delta_stop_count = 0
             if delta_stop_count>=delta_stop_count_end:
@@ -504,11 +504,11 @@ def gm_assign_to_cluster(X, center_list, cov_list, p_k):
         #log_p_nk[:,k] = logmulnormpdf(X, center_list[k], cov_list[k]) + np.log(p_k[k]) - log_p_Xn
         log_p_nk[:,k] = log_p_Xn_mat[:,k] - log_p_Xn
     
-    print log_p_nk
+    print(log_p_nk)
     #Assign to cluster:
     maxP_k = np.c_[np.max(log_p_nk, axis=1)] == log_p_nk
     #print np.max(log_p_nk, axis=1)
-    maxP_k = maxP_k * (np.array(range(K))+1)
+    maxP_k = maxP_k * (np.array(list(range(K)))+1)
     return np.sum(maxP_k, axis=1) - 1
 
 

@@ -18,7 +18,7 @@
 
 import unittest
 import copy
-from GaussianProcess import *
+from .GaussianProcess import *
 
 class TestSequenceFunctions(unittest.TestCase):
 

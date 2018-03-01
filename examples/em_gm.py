@@ -26,7 +26,7 @@ plot(X[:,0], X[:,1], '.')
 # Expectation-Maximization of Mixture of Gaussians
 cen_lst, cov_lst, p_k, logL = gmm.em_gm(X, K = 3, iter = 400,\
     verbose = True, iter_call = iter_plot)
-print "Log likelihood (how well the data fits the model) = ", logL
+print("Log likelihood (how well the data fits the model) = ", logL)
 
 # Plot the cluster ellipses
 for i in range(len(cen_lst)):

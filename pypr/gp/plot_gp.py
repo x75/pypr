@@ -39,7 +39,7 @@ def plot_gpr(xs, ys, s2, axes=None,
     xsf = xs.flatten()
     ysf = ys.flatten()
     s2f = 2*pl.sqrt(s2.flatten())
-    verts = zip(xsf, ysf+s2f) + zip(xsf[::-1], (ysf-s2f)[::-1])
+    verts = list(zip(xsf, ysf+s2f)) + list(zip(xsf[::-1], (ysf-s2f)[::-1]))
     poly = ax.fill_between(xsf, ysf-s2f, ysf+s2f, **shade_settings)
     line = ax.plot(xs, ys, **line_settings)
     return line, poly

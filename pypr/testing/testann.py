@@ -10,7 +10,7 @@ class TestANN(unittest.TestCase):
 
     def setUp(self):
         # Not much here yet
-        self.seq = range(10)
+        self.seq = list(range(10))
 
 
     def test_default_constructor(self):
@@ -151,7 +151,7 @@ def calc_weight_abs_diff(w1, w2):
     totsum = 0
     if (len(w1) != len(w2)):
         raise Exception('Lists should be the same size')
-    for i in xrange(0, len(w1)):
+    for i in range(0, len(w1)):
         ww1 = w1[i]
         ww2 = w2[i]
         totsum += np.sum(np.abs(ww1-ww2))

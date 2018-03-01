@@ -1,3 +1,3 @@
-from ljungbox import *
-from model_select import *
+from .ljungbox import *
+from .model_select import *
 

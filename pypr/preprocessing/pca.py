@@ -1,5 +1,5 @@
 import numpy as np
-import normalizer as nrm
+from . import normalizer as nrm
 
 class PCA(nrm.Normalizer):
     """

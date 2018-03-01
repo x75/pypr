@@ -1,5 +1,5 @@
 __all__ = ["minimize"]
 
-from minimize import *
+from .minimize import *
 
 

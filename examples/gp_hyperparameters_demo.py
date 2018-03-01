@@ -33,7 +33,7 @@ def update(val):
                 ', and $\mathrm{log}(\sigma_n)=' + '%.2f$'%orig_values[2])
     l, = ax.plot(x, y, 'x')
     se_iso.set_params([s_sls.val, s_sm.val])
-    print "update: ", s_nm.val
+    print("update: ", s_nm.val)
     noise.set_params([s_nm.val])
     ys, s2 = g.regression(x, y, xs)
     plot_gp.plot_gpr(xs, ys, s2, axes=ax)

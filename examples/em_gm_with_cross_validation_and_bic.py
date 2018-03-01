@@ -15,12 +15,12 @@ V = gmm.sample_gaussian_mixture(centroids, ccov, mc, samples=500)
 plot(T[:,0], T[:,1], '.')
 
 # Expectation-Maximization of Mixture of Gaussians
-Krange = range(1, 20 + 1);
+Krange = list(range(1, 20 + 1));
 runs = 1
 meanLogL_train = np.zeros((len(Krange), runs))
 meanLogL_valid = np.zeros((len(Krange), runs))
 for K in Krange:
-    print "Clustering for K = ", K; sys.stdout.flush()
+    print("Clustering for K = ", K); sys.stdout.flush()
     for r in range(runs):
         cen_lst, cov_lst, p_k, logL = gmm.em_gm(T, K = K, iter = 100)
         meanLogL_train[K-1, r] = logL
@@ -40,7 +40,7 @@ bic = np.zeros(len(Krange))
 X = np.concatenate((T,V), axis = 0)
 meanLogL_full = np.zeros(len(Krange))
 for i, K in enumerate(Krange):
-    print "Clustering for K = ", K; sys.stdout.flush()
+    print("Clustering for K = ", K); sys.stdout.flush()
     for r in range(runs):
         cen_lst, cov_lst, p_k, logL = gmm.em_gm(X, K = K, iter = 100)
         meanLogL_full[i] += logL

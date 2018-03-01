@@ -16,7 +16,7 @@ class cfCovarianceFunction(object):
     When creating a new covariance function, you should inherit this class.
     """
     def __init__(self):
-        raise Exception, "You should not use this function, just extend it."
+        raise Exception("You should not use this function, just extend it.")
     def eval(self, x, xs=None):
         """
         Calculate the covariance matrix.
@@ -44,7 +44,7 @@ class cfCovarianceFunction(object):
         covariances of the test set. Ks is a (N x M) matrix containing the
         cross variance between the training and test data.
         """
-        raise Exception, "You must implement the eval(self, x1, x2) function."
+        raise Exception("You must implement the eval(self, x1, x2) function.")
 
     def derivative(self, x, param_no):
         """
@@ -64,7 +64,7 @@ class cfCovarianceFunction(object):
             parameter number param_no. If `x` is a (N x D) matrix, then the
             returned matrix will be a (N x N) matrix.
         """
-        raise Exception, "You must implement derivative(self, x, param_no)."
+        raise Exception("You must implement derivative(self, x, param_no).")
 
     def __add__(self, other):
         """
@@ -83,7 +83,7 @@ class cfCovarianceFunction(object):
             Returns a list of hyperparameters. The order of the list is
             important.
         """
-        raise Exception, "Please override this method."
+        raise Exception("Please override this method.")
     
     def set_params(self, log_parameters):
         """Set hyperparameters to the values given.
@@ -93,7 +93,7 @@ class cfCovarianceFunction(object):
             Set the hyperparameters. The order of the list is important. The
             covariance functions' hyperparameters are set from left to right.
         """
-        raise Exception, "Please override this method."
+        raise Exception("Please override this method.")
     
     def clear_temp(self):
         """

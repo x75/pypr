@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.random as rnd
-import activation_functions as af
-import error_functions as ef
+from . import activation_functions as af
+from . import error_functions as ef
 
 #
 # A simple feedforward multilayer neural network
@@ -290,7 +290,7 @@ class ANN():
                 raise "Only 1-dim arrays please"
         if W.ndim>2:
                 raise "Only 1-dim arrays please"
-        for i in xrange(0, len(self.weights)):
+        for i in range(0, len(self.weights)):
             r, c = np.shape(self.weights[i])
             w = W[idxStart:r*c+idxStart]
             idxStart = idxStart + r * c
@@ -373,8 +373,8 @@ class ANN():
             r, c = np.shape(w)
             layerres = np.zeros(np.shape(w))
             origErr = error_func(self.forward(inputs), targets)
-            for i in xrange(0, r):
-                for j in xrange(0, c):
+            for i in range(0, r):
+                for j in range(0, c):
                     oldval = w[i,j]
                     w[i,j] = w[i,j]+delta;
                     newErr = error_func(self.forward(inputs), targets)
@@ -427,7 +427,7 @@ decay, otherwise it works just like an ANN.
     """
     # TODO: Check gradient correctness
     def __init__(self, *args, **kwargs):
-        if kwargs.has_key('weight_decay'):            
+        if 'weight_decay' in kwargs:            
             self.v = kwargs[weightdecay]
             kwargs.pop('weight_decay')
         else:

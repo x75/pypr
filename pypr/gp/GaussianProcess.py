@@ -4,7 +4,7 @@ import numpy as np
 import scipy.optimize
 import scipy.linalg as la
 from pypr.optimization import minimize
-from covar_funcs import *
+from .covar_funcs import *
 
 class GaussianProcess:
     """
@@ -38,13 +38,13 @@ class GaussianProcess:
         """
         # Do some input sanity checking:
         if X.shape[0]!=y.shape[0]:
-            raise ValueError, "X and y must have the same number of samples."
+            raise ValueError("X and y must have the same number of samples.")
 
         if X.ndim != 2:
-            raise ValueError, "X must be a 2 dimensional array"
+            raise ValueError("X must be a 2 dimensional array")
 
         if y.ndim != 1:
-            raise ValueError, "y must be a 1 dimensional array"
+            raise ValueError("y must be a 1 dimensional array")
  
         # If all ok
         self.X = X
@@ -354,10 +354,10 @@ class GPR(object):
         self.old_lh_res = None
 
     def _print_progress(self, params):
-        print "Iteration number: ", self._itr
-        print np.atleast_2d((self.GP.find_likelihood_der(self.X, self.y))[0])        
+        print("Iteration number: ", self._itr)
+        print(np.atleast_2d((self.GP.find_likelihood_der(self.X, self.y))[0]))        
         self._itr += 1
-        print "Parameters: ", params
+        print("Parameters: ", params)
         sys.stdout.flush() # python doesn't really like to write to stdout :)
         if self.callback!=None:
             self.callback(self, params)

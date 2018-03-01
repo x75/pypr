@@ -34,11 +34,11 @@ mc = np.ones(K_orig) / K_orig # All clusters equally probable
 N = 1000
 X = gmm.sample_gaussian_mixture(cen_lst, cov_lst, mc, samples=N)
 
-K_range = range(2, 10)
+K_range = list(range(2, 10))
 runs = 10
 bic_table = np.zeros((len(K_range), runs))
 for K_idx, K in enumerate(K_range):
-    print "Clustering for K=%d" % K
+    print("Clustering for K=%d" % K)
     for i in range(runs):
         cluster_init_kw = {'cluster_init':'sample', 'max_init_iter':5, \
             'cov_init':'var', 'verbose':True}

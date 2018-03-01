@@ -6,13 +6,13 @@ def shuffle(A, axis = 0):
     if axis = 1 then the columns are shuffled.
     """
     if (axis!=0) and (axis!=1):
-        raise ValueError, "Axis argument must be 0 or 1"
+        raise ValueError("Axis argument must be 0 or 1")
     r, c = np.shape(A)
     res = np.ones((r, c), dtype = A.dtype)
     if axis == 0:
-        sr = range(0, r)
+        sr = list(range(0, r))
     else:
-        sr = range(0, c)
+        sr = list(range(0, c))
     np.random.shuffle(sr)
     if axis == 0:
         res = A[sr, :]

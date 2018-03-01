@@ -5,7 +5,7 @@
 from distutils.core import setup
 
 setup(name='PyPR',
-      version='0.1',
+      version='0.1-py3',
       description='Python Pattern Recognition',
       author='Joan Petur Petersen',
       author_email='joanpeturpetersen@gmail.com',
