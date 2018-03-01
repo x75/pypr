@@ -540,7 +540,7 @@ def cond_dist(Y, centroids, ccov, mc):
         conditional distribution.
     """
     not_set_idx = np.nonzero(np.isnan(Y))[0]
-    set_idx = np.nonzero(True - np.isnan(Y))[0]
+    set_idx = np.nonzero(np.logical_xor(True, np.isnan(Y)))[0]
     new_idx = np.concatenate((not_set_idx, set_idx))
     y = Y[set_idx]
     # New centroids and covar matrices
