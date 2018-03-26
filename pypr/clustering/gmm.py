@@ -195,7 +195,7 @@ def sample_gaussian_mixture(centroids, ccov, mc = None, samples = 1):
     for k in range(K):
         idx = (sel_idx >= cs_mc[k]) * (sel_idx < cs_mc[k+1])
         ksamples = np.sum(idx)
-        drawn_samples = np.random.multivariate_normal(\
+        drawn_samples = np.random.multivariate_normal(
             cc[k], ccov[k], ksamples)
         res[idx,:] = drawn_samples
     return res
